@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> MY GAME </title>
+    <style>
+        h1 {
+            text-align: center;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            color: lightseagreen;
+            border: solid black 1.5px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            margin: auto;
+        }
+    
+    </style>
+</head>
+<body>
+    <h1>• Game •</h1>
+    
+    <script>
+        var canvas, LARGURA, ALTURA, ctx, frames = 0;
+
+        chao = {
+            y: 550,
+            altura: 50,
+
+            desenha: function(){
+                ctx.fillRect(0,0,0,0);
+                ctx.fillStyle = "black";
+            }
+        };
+
+        function teclaPressionada(e){
+            
+        }
+
+        function main(){
+             ALTURA = window.innerHeight;
+             LARGURA = window.innerWidth;
+
+             if( LARGURA >= 500){
+                 LARGURA = 700;
+                 ALTURA = 350;
+             }
+
+             canvas = document.createElement("canvas");
+             canvas.width = LARGURA;
+             canvas.height = ALTURA;
+             canvas.style.border = "1px solid #000";
+
+             ctx = canvas.getContext("2d"); 
+             document.body.appendChild(canvas);
+             document.addEventListener("keydown", teclaPressionada);
+
+            roda();
+        }
+
+        function roda(){
+            atualiza();
+            desenha();
+
+            window.requestAnimationFrame(roda);
+        }
+
+        function atualiza(){
+            frames++;
+        }
+        function desenha(){
+            ctx.fillRect(0, 0, LARGURA, ALTURA);
+            ctx.fillStyle = "lightgreen";
+        }
+
+        main();
+    </script>
+</body>
+</html>
