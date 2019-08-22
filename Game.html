@@ -8,10 +8,9 @@
         h1 {
             text-align: center;
             font-family: Georgia, 'Times New Roman', Times, serif;
-            color: lightseagreen;
-            border: solid black 1.5px;
+            color: rgb(2, 2, 2);
+            
         }
-
         canvas {
             position: absolute;
             top: 0px;
@@ -20,27 +19,139 @@
             right: 0px;
             margin: auto;
         }
-    
     </style>
 </head>
 <body>
-    <h1>• Game •</h1>
+    <h1>• GAME  •</h1>
     
     <script>
-        var canvas, LARGURA, ALTURA, ctx, frames = 0;
+        var canvas, LARGURA, ALTURA, ctx, frames = 0, velocidade = 5, estadoAtual;
+
+        estados = {
+            jogar: 0,
+            jogando: 1,
+            perdeu: 2
+        },
 
         chao = {
-            y: 550,
-            altura: 50,
+            y: 430,
+            altura: 30,
+            cor: "lightgreen",
 
             desenha: function(){
-                ctx.fillRect(0,0,0,0);
-                ctx.fillStyle = "black";
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(0, this.y, LARGURA, this.altura);
             }
+        }, 
+
+        bloco = {
+            x: 250,
+            y: 270,
+            altura: 20,
+            largura: 30,
+            cor: "#FAD35C",
+            gravidade: 1.5,
+            velocidade: 0,
+            forcaDoPulo: 7,
+
+            atualiza: function(){
+                this.velocidade += this.gravidade;
+                this.y += this.velocidade;
+
+                if(this.y > chao.y - this.altura){
+                    this.y = chao.y - this.altura;
+                    this.velocidade = 0;
+                }
+                if( this.y <= 0)
+                    estadoAtual = estados.perdeu;
+            },
+
+            pula: function(){
+               this.velocidade = -this.forcaDoPulo;
+            },
+
+            desenha: function(){
+                ctx.fillStyle = this.cor;
+                ctx.strokeStyle = "darkbalck";
+                ctx.fillRect(this.x, this.y, this.largura, this.altura);
+                ctx.strokeRect(this.x, this.y, 30, 20);
+            }
+        },
+
+        obstaculos = {
+            vetorObstaculo: [],
+            cores: ["black", "white", "#FF837A", "#422220", "#994F49", "#42BEC2", "#2D8285", "#57F9FF", "#66FF7A" ],
+            tempoInsere: 0,
+
+            insere: function(){
+                this.vetorObstaculo.push({
+                    x: LARGURA,
+                    largura: 30 + Math.floor(51 * Math.random()),
+                    altura: 220 + Math.floor(10 * Math.random()),
+                    cor: this.cores[Math.floor(3 * Math.random())]
+                });
+
+                this.tempoInsere = 80 + Math.floor(30*Math.random());
+            },
+
+            atualiza: function(){
+                if (this.tempoInsere == 0 ){
+                    this.insere();
+                } else
+                    this.tempoInsere--;
+
+                for (var i=0, tam = this.vetorObstaculo.length; i<tam; i++){
+                    var obs = this.vetorObstaculo[i];
+
+                    obs.x -= velocidade;
+
+                    if (bloco.x < obs.x + obs.largura 
+                    && bloco.x + bloco.largura >= obs.x 
+                    && bloco.y + bloco.altura >= chao.y - obs.altura){
+                        estadoAtual = estados.perdeu;
+                    }
+
+                   else if( obs.x <= -obs.largura){
+                        this.vetorObstaculo.splice(i, 1);
+                        tam--;
+                        i--;
+                    }
+                }
+            },
+
+            limpa: function(){
+                this.vetorObstaculo = [];
+            },
+
+            desenha: function(){
+                for (var i = 0, tam = this.vetorObstaculo.length; i < tam; i++ ){
+                    var obs = this.vetorObstaculo[i];
+                    ctx.fillStyle = obs.cor;
+                    ctx.fillRect(obs.x, chao.y - obs.altura, obs.largura, obs.altura);
+                }
+            } 
         };
 
         function teclaPressionada(e){
-            
+            console.log(e.keyCode);
+            if( estadoAtual == estados.jogando){
+                if(e.keyCode == 38)   
+                     bloco.pula();
+            } 
+        }
+
+        function clique(e){
+            if( estadoAtual == estados.jogar){
+                obstaculos.limpa();
+                estadoAtual = estados.jogando;
+                bloco.y = 150;
+                bloco.gravidade = 0.5;
+            } 
+            else if ( estadoAtual == estados.perdeu){
+                estadoAtual = estados.jogar;
+                bloco.y = 150;
+                bloco.gravidade = 0;
+            }
         }
 
         function main(){
@@ -48,19 +159,22 @@
              LARGURA = window.innerWidth;
 
              if( LARGURA >= 500){
-                 LARGURA = 700;
-                 ALTURA = 350;
+                 LARGURA = window.innerWidth-250;
+                 ALTURA = 450;
              }
 
              canvas = document.createElement("canvas");
              canvas.width = LARGURA;
              canvas.height = ALTURA;
-             canvas.style.border = "1px solid #000";
+             canvas.style.border = "3px solid lightgreen";
 
              ctx = canvas.getContext("2d"); 
              document.body.appendChild(canvas);
+
+             document.addEventListener("mousedown", clique); 
              document.addEventListener("keydown", teclaPressionada);
 
+            estadoAtual = estados.jogar;
             roda();
         }
 
@@ -68,15 +182,33 @@
             atualiza();
             desenha();
 
-            window.requestAnimationFrame(roda);
+            requestAnimationFrame(roda);
         }
 
         function atualiza(){
             frames++;
+            bloco.atualiza();
+
+            if(estadoAtual == estados.jogando){
+                obstaculos.atualiza();
+            }
         }
         function desenha(){
+            ctx.fillStyle = "#3D3D3D";
             ctx.fillRect(0, 0, LARGURA, ALTURA);
-            ctx.fillStyle = "lightgreen";
+            
+            if(estadoAtual == estados.jogar){
+                ctx.fillStyle = "green";
+                ctx.fillRect((LARGURA/2)-50, (ALTURA/2)-50, 50, 50);
+            } else if(estadoAtual == estados.perdeu){
+                ctx.fillStyle = "red";
+                ctx.fillRect((LARGURA/2)-50, (ALTURA/2)-50, 50, 50);
+            } else if( estadoAtual == estados.jogando ){
+                obstaculos.desenha();
+            }
+
+            chao.desenha();
+            bloco.desenha();
         }
 
         main();
