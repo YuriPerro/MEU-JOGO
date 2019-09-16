@@ -1,13 +1,12 @@
 function Sprite(exemplo = {}){
     var {
         x = 250,
-        y = 20,
+        y = 225,
         largura = 50,
         altura = 18,
         vx = 0,
         vy = 0,
         color = "#F9483B",
-        atirando = 0,
         gravidade = 1.5,
         velocidade = 0,
         forcaDoPulo = 7,
@@ -21,7 +20,6 @@ function Sprite(exemplo = {}){
     this.vx = vx;
     this.vy = vy;
     this.color = color;
-    this.atirando = atirando;
     this.gravidade = gravidade;
     this.velocidade = velocidade;
     this.forcaDoPulo = forcaDoPulo;
@@ -45,10 +43,31 @@ Sprite.prototype.atualiza = function(chao){
     this.velocidade += this.gravidade;
     this.y += this.velocidade;
 
-        if(this.y > chao.y - this.altura){
-            this.y = chao.y - this.altura;
-            this.velocidade = 0;
-        }
-        if( this.y <= 0)
+    if(this.y > chao.y - this.altura){
+        this.y = chao.y - this.altura;
+        this.velocidade = 0;
+    }
+}
+
+Sprite.prototype.colidiuCom = function(obs){
+    if( obs.x <= -obs.largura)
+        pontos += 1/2;
+
+    if( this.y <= 0){
             estadoAtual = estados.perdeu;
+        }
+
+    if (this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
+        && this.y + this.altura >= chao.y - obs.altura){
+            recorde = pontos;
+            pontos = 0;
+            estadoAtual = estados.perdeu;
+        }
+
+    else if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
+            && this.y + this.altura <= obs.altura ){
+                recorde = pontos;
+                pontos = 0;
+                estadoAtual = estados.perdeu;
+        }
 }

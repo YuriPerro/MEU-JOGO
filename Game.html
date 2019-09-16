@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> MY GAME </title>
+    <script src="tiros.js"></script>
     <script src="./Sprite.js"></script>
+    <script src="Obstaculos.js"></script>
     <style>
         h1 {
             text-align: center;
             font-family: Georgia, 'Times New Roman', Times, serif;
-            color: rgb(2, 2, 2);
+            color: rgb(253, 253, 253);
         }
         canvas {
             position: absolute;
@@ -20,6 +22,10 @@
             right: 0px;
             margin: auto;
         }
+        body {
+            background-color: rgb(8, 2, 2);
+        }
+
     </style>
 </head>
 
@@ -27,19 +33,19 @@
     <h1>• GAME •</h1>
 
     <script>
-        var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, ctx, frames = 0, velocidade = 5, estadoAtual;
+        var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
+        ctx, frames = 0, velocidade = 5, estadoAtual;
         var bloco = new Sprite({});
-        var tiros = [];
+        var OBS = new Obstaculos({});
+        var tirosVetor = [];
+        var dt, anterior = 0;
 
-        teclas = {
-            espaco: 0,
-        }
         estados = {
             jogar: 0,
             jogando: 1,
             perdeu: 2
         },
-            chao = {
+        chao = {
                 y: 470,
                 altura: 30,
                 cor: "#457164",
@@ -47,76 +53,28 @@
                     ctx.fillStyle = this.cor;
                     ctx.fillRect(0, this.y, LARGURA, this.altura);
                 }
-            },
-            obstaculos = {
-                vetorObstaculo: [],
-                cores: ["black", "white", "#FF837A", "#422220", "#994F49", "#42BEC2", "#2D8285", "#57F9FF", "#66FF7A"],
-                tempoInsere: 0,
-                insere: function () {
-                    this.vetorObstaculo.push({
-                        x: LARGURA,
-                        largura: 50,
-                        //largura: 30 + Math.floor(51 * Math.random()),
-                        altura: (230 * Math.random()) + Math.floor(170 * Math.random()),
-                        cor: this.cores[Math.floor(3 * Math.random())]
-                    });
-
-                    this.tempoInsere = 35 + Math.floor(30 * Math.random());
-                },
-                atualiza: function () {
-                    if (this.tempoInsere == 0) {
-                        this.insere();
-                    } else
-                        this.tempoInsere--;
-
-                    for (var i = 0, tam = this.vetorObstaculo.length; i < tam; i++) {
-                        var obs = this.vetorObstaculo[i];
-                        obs.x -= velocidade;
-
-                        if (bloco.x < obs.x + obs.largura
-                            && bloco.x + bloco.largura >= obs.x
-                            && bloco.y + bloco.altura >= chao.y - obs.altura) {
-                            recorde = pontos;
-                            pontos = 0;
-                            estadoAtual = estados.perdeu;
-                        }
-
-                        if (obs.x + obs.largura == bloco.x)
-                            pontos++;
-
-                        else if (obs.x <= -obs.largura) {
-                            this.vetorObstaculo.splice(i, 1);
-                            tam--;
-                            i--;
-                        }
-                    }
-                },
-                limpa: function () {
-                    this.vetorObstaculo = [];
-                },
-                desenha: function () {
-                    for (var i = 0, tam = this.vetorObstaculo.length; i < tam; i++) {
-                        var obs = this.vetorObstaculo[i];
-                        ctx.fillStyle = obs.cor;
-                        ctx.fillRect(obs.x, chao.y - obs.altura, obs.largura, obs.altura);
-                    }
-                }
-            };
-        function teclaPressionada(e) {
-            console.log(e.keyCode);
-            if (estadoAtual == estados.jogando) {
-                switch (e.keyCode) {
-                    case 38:
-                        bloco.pula();
-                        break;
-                    default:
-                        break;
-                }
+        },
+        
+        addEventListener("keydown", function(e){
+            if (e.keyCode == 38){
+                bloco.pula();
             }
-        }
-        function clique(e) {
+            if (e.keyCode == 32){
+                var tiro = new tiros ({
+                    x: bloco.x,
+                    y: bloco.y,
+                    vx: 200,
+                    color: "red",
+                })
+                tirosVetor.push(tiro);
+                tiro.atualiza(dt);
+            }
+
+        });
+    
+        addEventListener("mousedown", function clique(e) {
             if (estadoAtual == estados.jogar) {
-                obstaculos.limpa();
+                OBS.limpa();
                 velocidade = 5;
                 estadoAtual = estados.jogando;
                 bloco.gravidade = 0.5;
@@ -126,50 +84,52 @@
                 bloco.gravidade = 0;
                 estadoAtual = estados.jogar;
             }
-        }
+        });
+        
         function main() {
             ALTURA = window.innerHeight;
             LARGURA = window.innerWidth;
             if (LARGURA >= 500) {
                 LARGURA = window.innerWidth - 100;
-                ALTURA = 530;
+                ALTURA = 500;
             }
             canvas = document.createElement("canvas");
             canvas.width = LARGURA;
             canvas.height = ALTURA;
+
             canvas.style.border = "5px solid black";
-
             ctx = canvas.getContext("2d");
-            document.body.appendChild(canvas);
 
-            document.addEventListener("mousedown", clique);
-            document.addEventListener("keydown", teclaPressionada);
+            document.body.appendChild(canvas);
             estadoAtual = estados.jogar;
             roda();
         }
 
-        function roda() {
+        function roda(t) {
+            dt = (t - anterior)/1000;
             atualiza();
             desenha();
+            anterior = t
+
             requestAnimationFrame(roda);
         }
 
         function atualiza() {
             frames++;
-            bloco.atualiza(chao);
+
             if (estadoAtual == estados.jogando) {
-                obstaculos.atualiza();
+                OBS.atualiza(bloco, chao);
+                bloco.colidiuCom(OBS);
+                bloco.atualiza(chao);
             }
         }
-
         function desenha() {
-            ctx.fillStyle = "#88D3BC";              //Cor da canvas
+            ctx.fillStyle = "#BBE8B5";              //Cor da canvas
             ctx.fillRect(0, 0, LARGURA, ALTURA);    //Localizaçao da canvas
-
+           
             if (estadoAtual == estados.jogar) {
                 ctx.fillStyle = "white";            //Cor do retangulo do play
                 ctx.fillRect((LARGURA / 2) - 100, (ALTURA / 2) - 50, 170, 68); //Localizaçao
-
                 ctx.fillStyle = "green";             //Cor do PLAY
                 ctx.font = "50px bold arial";        //Tipografia do PLAY
                 ctx.fillText("PLAY", (LARGURA / 2) - 80, (ALTURA / 2));     //Localizaçao do PLAY
@@ -177,25 +137,21 @@
             else if (estadoAtual == estados.perdeu) {
                 ctx.fillStyle = "white";                            //Fundo do PERDEU
                 ctx.fillRect(0, (ALTURA / 2) - 150, LARGURA, 68);   //Localizaçao do PERDEU
-
                 ctx.fillStyle = "lightgreen";                          //Fundo do New Game 
                 ctx.fillRect((LARGURA / 2) - 110, (ALTURA / 2) + 20, 150, 40);  // Localização 
-
-                ctx.fillStyle = "white";                    //Cor do Record
+                ctx.fillStyle = "black";                    //Cor do Record
                 ctx.font = "35px bold arial";               //Tipografia
                 ctx.fillText(recorde, (LARGURA / 2) + 15, (ALTURA / 2) - 10);       //Localizaçao da pontuaçao
                 ctx.fillText("Record: ", (LARGURA / 2) - 110, (ALTURA / 2) - 12);   //Localizaçao da escrita
-
                 ctx.fillStyle = "black";                  //Cor do New Game
                 ctx.font = "25px bold moncspace";         //Tipografia do New Game
                 ctx.fillText("New Game", (LARGURA / 2) - 92, (ALTURA / 2) + 48);    //Localizaçao
-
                 ctx.fillStyle = "red";                     //Cor do Perdeu 
                 ctx.font = "50px bold moncspace";          //Tipografia do Perdeu     
-                ctx.fillText("SE FUDEU", (LARGURA / 2) - 150, (ALTURA / 2) - 100);    //Localizaçao
+                ctx.fillText("Tenta dnv campeão", (LARGURA / 2) - 230, (ALTURA / 2) - 100);    //Localizaçao
             }
             else if (estadoAtual == estados.jogando) {
-                obstaculos.desenha();
+                OBS.desenha();
                 ctx.fillStyle = "black";
                 ctx.font = "35px bold impact";
                 ctx.fillText(pontos, 128, 52);
