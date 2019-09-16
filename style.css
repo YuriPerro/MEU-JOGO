@@ -1,0 +1,32 @@
+@keyframes fade{
+    from{
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+h1 {
+
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: rgb(253, 253, 253);
+}
+
+canvas {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin: auto;
+
+    animation: fade 0.5s;
+    animation-delay: 1s;
+    animation-fill-mode: backwards;
+}
+
+body {
+    background-color: rgb(55, 0, 100);
+}

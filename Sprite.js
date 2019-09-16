@@ -74,9 +74,9 @@ Sprite.prototype.colidiuCom = function(obs){
         } 
 
     else if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
-            && this.y + this.altura <= obs.altura ){
-                recorde = pontos;
-                pontos = 0;
-                estadoAtual = estados.perdeu;
+                && this.y + this.altura <= obs.altura ){
+            recorde = pontos;
+            pontos = 0;
+            estadoAtual = estados.perdeu;
         }
 }

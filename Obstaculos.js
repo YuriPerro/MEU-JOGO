@@ -1,16 +1,20 @@
 function Obstaculos(exemplo = {}){
     var {
+
         vetorObstaculo = [],
         vetorObstaculo2 = [],
         cores = ["black", "white", "#FF837A", 
         "#422220", "#994F49", "#42BEC2", "#2D8285", "#57F9FF", "#66FF7A"],
         tempoInsere = 0,
+
     } = exemplo;
+
         this.vetorObstaculo2 = vetorObstaculo2;
         this.vetorObstaculo = vetorObstaculo;
         this.cores = cores;
         this.tempoInsere = tempoInsere;
 }
+
 Obstaculos.prototype = new Obstaculos ({});
 Obstaculos.constructor = Obstaculos;
 
@@ -29,7 +33,7 @@ Obstaculos.prototype.insere = function (){
         cor: this.cores[Math.floor(3 * Math.random())]
     });
 
-    this.tempoInsere = 35 + Math.floor(30 * Math.random());
+    this.tempoInsere = 100 + Math.floor(30 * Math.random());
 }
 
 Obstaculos.prototype.atualiza = function (bloco, chao){

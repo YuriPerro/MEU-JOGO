@@ -8,29 +8,12 @@
     <script src="tiros.js"></script>
     <script src="Sprite.js"></script>
     <script src="Obstaculos.js"></script>
-    <style>
-        h1 {
-            text-align: center;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-            color: rgb(253, 253, 253);
-        }
-        canvas {
-            position: absolute;
-            top: 0px;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            margin: auto;
-        }
-        body {
-            background-color: rgb(55, 0, 100);
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css"/>
+ 
 </head>
 
 <body>
-    <h1>• GAME •</h1>
+    <h1>• Flappy Gun •</h1>
 
     <script>
         var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
@@ -39,15 +22,16 @@
         var OBS = new Obstaculos({});
         var tirosVetor = [];
         var dt, anterior = 0;
+
         var teclas = {
             espaco: 0,
-            stop: 0,
         }
 
         estados = {
             jogar: 0,
             jogando: 1,
-            perdeu: 2
+            perdeu: 2,
+            stop: 0,
         },
         chao = {
                 y: 470,
@@ -83,7 +67,7 @@
                 estadoAtual = estados.jogando;
                 bloco.gravidade = 0.5;
             }
-                else if (estadoAtual == estados.perdeu) {
+            else if (estadoAtual == estados.perdeu) {
                 bloco.y = 220;
                 bloco.gravidade = 0;
                 estadoAtual = estados.jogar;
@@ -115,7 +99,7 @@
             desenha();
             anterior = t
             
-        if(teclas.espaco && teclas.stop == 0 && bloco.atirando <= 0){
+        if(teclas.espaco && estados.stop == 0 && bloco.atirando <= 0){
           var tiro = new tiros({
               x: bloco.x + bloco.largura,
               y: bloco.y,
@@ -201,6 +185,7 @@
                 ctx.fillText(pontos, 128, 52);
                 ctx.fillText("Score:", 30, 50);
             }
+
             bloco.desenha(ctx);
             chao.desenha();
         }
