@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> MY GAME </title>
     <script src="tiros.js"></script>
-    <script src="./Sprite.js"></script>
+    <script src="Sprite.js"></script>
     <script src="Obstaculos.js"></script>
     <style>
         h1 {
@@ -23,7 +23,7 @@
             margin: auto;
         }
         body {
-            background-color: rgb(8, 2, 2);
+            background-color: rgb(55, 0, 100);
         }
 
     </style>
@@ -39,6 +39,10 @@
         var OBS = new Obstaculos({});
         var tirosVetor = [];
         var dt, anterior = 0;
+        var teclas = {
+            espaco: 0,
+            stop: 0,
+        }
 
         estados = {
             jogar: 0,
@@ -59,17 +63,17 @@
             if (e.keyCode == 38){
                 bloco.pula();
             }
-            if (e.keyCode == 32){
-                var tiro = new tiros ({
-                    x: bloco.x,
-                    y: bloco.y,
-                    vx: 200,
-                    color: "red",
-                })
-                tirosVetor.push(tiro);
-                tiro.atualiza(dt);
+            if (e.keyCode == 87){
+                console.log(e.keyCode)
+                teclas.espaco = 1;
             }
 
+        });
+
+        addEventListener("keyup", function(e){
+            if(e.keyCode == 87){
+                teclas.espaco = 0;
+            }
         });
     
         addEventListener("mousedown", function clique(e) {
@@ -79,14 +83,14 @@
                 estadoAtual = estados.jogando;
                 bloco.gravidade = 0.5;
             }
-            else if (estadoAtual == estados.perdeu) {
+                else if (estadoAtual == estados.perdeu) {
                 bloco.y = 220;
                 bloco.gravidade = 0;
                 estadoAtual = estados.jogar;
             }
         });
         
-        function main() {
+        function main() {                                                   //Função main 
             ALTURA = window.innerHeight;
             LARGURA = window.innerWidth;
             if (LARGURA >= 500) {
@@ -102,7 +106,7 @@
 
             document.body.appendChild(canvas);
             estadoAtual = estados.jogar;
-            roda();
+            requestAnimationFrame(roda);
         }
 
         function roda(t) {
@@ -110,6 +114,32 @@
             atualiza();
             desenha();
             anterior = t
+            
+        if(teclas.espaco && teclas.stop == 0 && bloco.atirando <= 0){
+          var tiro = new tiros({
+              x: bloco.x + bloco.largura,
+              y: bloco.y,
+              w: 10,
+              h: 10,
+              vx: 400,
+              color: "black",
+            });
+            tirosVetor.push(tiro);
+            bloco.atirando = 1/3;
+        }
+
+        bloco.mover(dt);
+
+            for (var i = 0; i < tirosVetor.length; i++) {
+                tirosVetor[i].mover(dt);
+            }
+            for (var i = 0; i < tirosVetor.length; i++) {
+                tirosVetor[i].desenha(ctx);
+            }
+            for (var i = 0; i < tirosVetor.length; i++) {
+                if (tirosVetor[i].x > canvas.width)
+                     tirosVetor.splice(i, 1);
+            }
 
             requestAnimationFrame(roda);
         }
@@ -122,6 +152,17 @@
                 bloco.colidiuCom(OBS);
                 bloco.atualiza(chao);
             }
+            if(estadoAtual == estados.jogando){
+                teclas.stop = 0;
+            }
+            if(estadoAtual == estados.perdeu){
+                tirosVetor = [];
+                teclas.stop = 1;
+            }
+            if(estadoAtual == estados.jogar){
+                tirosVetor = [];
+                teclas.stop = 1;
+            }
         }
         function desenha() {
             ctx.fillStyle = "#BBE8B5";              //Cor da canvas
@@ -130,6 +171,7 @@
             if (estadoAtual == estados.jogar) {
                 ctx.fillStyle = "white";            //Cor do retangulo do play
                 ctx.fillRect((LARGURA / 2) - 100, (ALTURA / 2) - 50, 170, 68); //Localizaçao
+
                 ctx.fillStyle = "green";             //Cor do PLAY
                 ctx.font = "50px bold arial";        //Tipografia do PLAY
                 ctx.fillText("PLAY", (LARGURA / 2) - 80, (ALTURA / 2));     //Localizaçao do PLAY
@@ -139,10 +181,12 @@
                 ctx.fillRect(0, (ALTURA / 2) - 150, LARGURA, 68);   //Localizaçao do PERDEU
                 ctx.fillStyle = "lightgreen";                          //Fundo do New Game 
                 ctx.fillRect((LARGURA / 2) - 110, (ALTURA / 2) + 20, 150, 40);  // Localização 
+
                 ctx.fillStyle = "black";                    //Cor do Record
                 ctx.font = "35px bold arial";               //Tipografia
                 ctx.fillText(recorde, (LARGURA / 2) + 15, (ALTURA / 2) - 10);       //Localizaçao da pontuaçao
                 ctx.fillText("Record: ", (LARGURA / 2) - 110, (ALTURA / 2) - 12);   //Localizaçao da escrita
+                
                 ctx.fillStyle = "black";                  //Cor do New Game
                 ctx.font = "25px bold moncspace";         //Tipografia do New Game
                 ctx.fillText("New Game", (LARGURA / 2) - 92, (ALTURA / 2) + 48);    //Localizaçao

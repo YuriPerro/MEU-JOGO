@@ -2,15 +2,15 @@ function tiros(exemplo = {}){
     var {
         x = 100,
         y = 200,
-        largura = 7,
-        altura = 7,
+        w = 7,
+        h = 7,
         vx = 100,
         cd = 0,
         color = "black",
     } = exemplo;
 
-    this.largura = largura;
-    this.altura = altura;
+    this.w = w;
+    this.h = h;
     this.x = x;
     this.y = y;
     this.vx = vx;
@@ -21,20 +21,16 @@ function tiros(exemplo = {}){
 tiros.prototype = new tiros({});
 tiros.prototype.constructor = tiros;
 
-tiros.prototype.atualiza = function(dt){
-    this.desenha();
-    this.mover(dt);
-    this.colidiu();
-}
-
-tiros.prototype.desenha = function(){
+tiros.prototype.desenha = function(ctx){
     ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.largura, this.altura);
+    ctx.fillRect(this.x, this.y, this.w, this.h);
 }
 
 tiros.prototype.mover = function(dt){
     this.x = this.x + this.vx * dt;
+    
 }
 
 tiros.prototype.colidiu = function(){
+
 }

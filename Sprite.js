@@ -10,6 +10,7 @@ function Sprite(exemplo = {}){
         gravidade = 1.5,
         velocidade = 0,
         forcaDoPulo = 7,
+        atirando = 0,
     } = exemplo;
 
     this.x = x;
@@ -23,6 +24,7 @@ function Sprite(exemplo = {}){
     this.gravidade = gravidade;
     this.velocidade = velocidade;
     this.forcaDoPulo = forcaDoPulo;
+    this.atirando = atirando;
 }
 
 Sprite.prototype = new Sprite({});
@@ -49,6 +51,13 @@ Sprite.prototype.atualiza = function(chao){
     }
 }
 
+Sprite.prototype.mover = function(dt){
+
+    if( this.atirando > 0 ){
+        this.atirando = this.atirando - 1*dt;
+    }
+}
+
 Sprite.prototype.colidiuCom = function(obs){
     if( obs.x <= -obs.largura)
         pontos += 1/2;
@@ -62,7 +71,7 @@ Sprite.prototype.colidiuCom = function(obs){
             recorde = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
-        }
+        } 
 
     else if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
             && this.y + this.altura <= obs.altura ){
