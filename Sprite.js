@@ -54,13 +54,13 @@ Sprite.prototype.atualiza = function(chao){
 Sprite.prototype.mover = function(dt){
 
     if( this.atirando > 0 ){
-        this.atirando = this.atirando - 1*dt;
+        this.atirando = this.atirando - dt;
     }
 }
 
 Sprite.prototype.colidiuCom = function(obs){
     if( obs.x <= -obs.largura)
-        pontos += 1/2;
+        pontos += 1;
 
     if( this.y <= 0){
             estadoAtual = estados.perdeu;
@@ -71,12 +71,14 @@ Sprite.prototype.colidiuCom = function(obs){
             recorde = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
-        } 
+        }
+}
 
-    else if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
-                && this.y + this.altura <= obs.altura ){
+Sprite.prototype.colidiuCom2 = function(obs){
+    if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
+        && this.y + this.altura <= obs.altura ){
             recorde = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
-        }
+    }
 }

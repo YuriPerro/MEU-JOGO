@@ -1,20 +1,16 @@
 function Obstaculos(exemplo = {}){
     var {
-
         vetorObstaculo = [],
         vetorObstaculo2 = [],
-        cores = ["black", "white", "#FF837A", 
+        cores = ["black", "white", "red", 
         "#422220", "#994F49", "#42BEC2", "#2D8285", "#57F9FF", "#66FF7A"],
         tempoInsere = 0,
-
     } = exemplo;
-
         this.vetorObstaculo2 = vetorObstaculo2;
         this.vetorObstaculo = vetorObstaculo;
         this.cores = cores;
         this.tempoInsere = tempoInsere;
 }
-
 Obstaculos.prototype = new Obstaculos ({});
 Obstaculos.constructor = Obstaculos;
 
@@ -22,18 +18,18 @@ Obstaculos.prototype.insere = function (){
     this.vetorObstaculo.push({
         x: LARGURA,
         largura: 60,
-        altura: (100 * Math.random()) + Math.floor(100 * Math.random()),
+        altura: Math.floor(100 * Math.random()) + Math.floor(100 * Math.random()),
         cor: this.cores[Math.floor(3 * Math.random())]
     });
 
     this.vetorObstaculo2.push({
         x: LARGURA,
         largura: 60,
-        altura: (100 * Math.random()) + Math.floor(100 * Math.random()),
+        altura: Math.floor(100 * Math.random()) + Math.floor(100 * Math.random()),
         cor: this.cores[Math.floor(3 * Math.random())]
     });
 
-    this.tempoInsere = 100 + Math.floor(30 * Math.random());
+    this.tempoInsere = 30 + Math.floor(60 * Math.random());
 }
 
 Obstaculos.prototype.atualiza = function (bloco, chao){
@@ -46,7 +42,7 @@ Obstaculos.prototype.atualiza = function (bloco, chao){
             var obs = this.vetorObstaculo[i];
                 obs.x -= velocidade;
 
-                bloco.colidiuCom(obs, chao);
+                bloco.colidiuCom(obs);
                     
              if (obs.x <= -obs.largura) {
                 this.vetorObstaculo.splice(i, 1);
@@ -56,12 +52,12 @@ Obstaculos.prototype.atualiza = function (bloco, chao){
         }
 
         for (var i = 0, tam = this.vetorObstaculo2.length; i < tam; i++) {
-            var obs = this.vetorObstaculo2[i];
-                obs.x -= velocidade;
+            var obs2 = this.vetorObstaculo2[i];
+                obs2.x -= velocidade;
             
-                bloco.colidiuCom(obs, chao);
+                bloco.colidiuCom2(obs2);
                     
-             if (obs.x <= -obs.largura) {
+             if (obs2.x <= -obs2.largura) {
                 this.vetorObstaculo2.splice(i, 1);
                 tam--;
                 i--;
