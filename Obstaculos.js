@@ -32,7 +32,7 @@ Obstaculos.prototype.insere = function (){
     this.tempoInsere = 30 + Math.floor(60 * Math.random());
 }
 
-Obstaculos.prototype.atualiza = function (bloco, chao){
+Obstaculos.prototype.atualiza = function (bloco){
     if (this.tempoInsere == 0) {
         this.insere();
     } else {

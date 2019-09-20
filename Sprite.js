@@ -1,9 +1,9 @@
 function Sprite(exemplo = {}){
     var {
         x = 250,
-        y = 225,
+        y = 215,
         largura = 50,
-        altura = 18,
+        altura = 40,
         vx = 0,
         vy = 0,
         color = "#F9483B",
@@ -31,10 +31,10 @@ Sprite.prototype = new Sprite({});
 Sprite.constructor = Sprite;
 
 Sprite.prototype.desenha = function(ctx){
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = "black";
-    ctx.fillRect(this.x, this.y, this.largura, this.altura);
-    ctx.strokeRect(this.x, this.y, this.largura, this.altura);
+    //ctx.fillStyle = this.color;
+    //ctx.strokeStyle = "black";
+    //ctx.fillRect(this.x, this.y, this.largura, this.altura);
+    //ctx.strokeRect(this.x, this.y, this.largura, this.altura);
 }
 
 Sprite.prototype.pula = function(){
@@ -75,8 +75,9 @@ Sprite.prototype.colidiuCom = function(obs){
 }
 
 Sprite.prototype.colidiuCom2 = function(obs){
+
     if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
-        && this.y + this.altura <= obs.altura ){
+        && this.y <= obs.altura ){
             recorde = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
