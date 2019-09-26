@@ -4,7 +4,7 @@ function tiros(exemplo = {}){
         y = 200,
         w = 7,
         h = 7,
-        vx = 100,
+        vx = 200,
         cd = 0,
         color = "black",
     } = exemplo;
@@ -28,7 +28,6 @@ tiros.prototype.desenha = function(ctx){
 
 tiros.prototype.mover = function(dt){
     this.x = this.x + this.vx * dt;
-    
 }
 
 tiros.prototype.colidiu = function(){

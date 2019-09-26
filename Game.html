@@ -9,6 +9,7 @@
     <script src="Sprite.js"></script>
     <script src="Obstaculos.js"></script>
     <script src="AssetsManager.js"></script>
+    <script src="enemy.js"></script>
     <link rel="stylesheet" href="style.css"/>
     <style>
     </style>
@@ -16,39 +17,40 @@
 
 <body>
     <h1>• GAME •</h1>
-
+    
     <script>
         var assetsMng = new AssetsManager();
         assetsMng.loadImage("player", "Assets/avatar1.png");
-
+        
         var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
         ctx, frames = 0, velocidade = 5, estadoAtual;
-
+        
         //Adicionando AssetsManager a Cena 1
         //var cena1 = new Scene({ ctx: ctx, w: canvas.width, h: canvas.height, assets:assetsMng})
-
+        
         var bloco = new Sprite({});
         var OBS = new Obstaculos({});
+        var inimigo = new enemy({});
         var tirosVetor = [];
         var dt, anterior = 0;
         var teclas = {
             espaco: 0,
             stop: 0,
         }
-
+        
         estados = {
             jogar: 0,
             jogando: 1,
             perdeu: 2
         },
         chao = {
-                y: 470,
-                altura: 30,
-                cor: "#457164",
-                desenha: function () {
-                    ctx.fillStyle = this.cor;
-                    ctx.fillRect(0, this.y, LARGURA, this.altura);
-                }
+            y: 460,
+            altura: 30,
+            cor: "#black",
+            desenha: function () {
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(0, this.y, LARGURA, this.altura);
+            }
         },
         
         addEventListener("keydown", function(e){
@@ -56,17 +58,16 @@
                 bloco.pula();
             }
             if (e.keyCode == 87){
-                console.log(e.keyCode)
                 teclas.espaco = 1;
             }
         });
-
+        
         addEventListener("keyup", function(e){
             if(e.keyCode == 87){
                 teclas.espaco = 0;
             }
         });
-    
+        
         addEventListener("mousedown", function clique(e) {
             if (estadoAtual == estados.jogar) {
                 OBS.limpa();
@@ -74,7 +75,7 @@
                 estadoAtual = estados.jogando;
                 bloco.gravidade = 0.5;
             }
-                else if (estadoAtual == estados.perdeu) {
+            else if (estadoAtual == estados.perdeu) {
                 bloco.y = 220;
                 bloco.gravidade = 0;
                 estadoAtual = estados.jogar;
@@ -91,23 +92,26 @@
             canvas = document.createElement("canvas");
             canvas.width = LARGURA;
             canvas.height = ALTURA;
-
+            
             canvas.style.border = "5px solid black";
             ctx = canvas.getContext("2d");
-
+            
             document.body.appendChild(canvas);
             estadoAtual = estados.jogar;
             requestAnimationFrame(roda);
         }
-
+        
+        
         function roda(t) {
             dt = (t - anterior)/1000;
             atualiza();
             desenha();
-            ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y-5, 50, 50);
-
-            
+            if(pontos > 0){
+                inimigo.desenha(ctx);
+                inimigo.mover(dt);
+            }
             anterior = t
+            ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y-5, 50, 50);
             
             if(teclas.espaco && teclas.stop == 0 && bloco.atirando <= 0){
                 var tiro = new tiros({
@@ -115,14 +119,14 @@
                     y: bloco.y +23  ,
                     w: 10,
                     h: 10,
-                    vx: 400,
+                    vx: 700,
                     color: "black",
                 });
             
             tirosVetor.push(tiro);
             bloco.atirando = 1/3;
         }
-
+        
         bloco.mover(dt);
 
             for (var i = 0; i < tirosVetor.length; i++) {       
@@ -146,10 +150,10 @@
                 OBS.atualiza(bloco);
                 bloco.colidiuCom(OBS);
                 bloco.atualiza(chao);
-            }
-            if(estadoAtual == estados.jogando){
+                inimigo.colidiu(tirosVetor);
                 teclas.stop = 0;
             }
+
             if(estadoAtual == estados.perdeu){
                 tirosVetor = [];
                 teclas.stop = 1;
