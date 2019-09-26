@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> MY GAME </title>
+    <title> Flappy Gun </title>
     <script src="tiros.js"></script>
     <script src="Sprite.js"></script>
     <script src="Obstaculos.js"></script>
@@ -16,11 +16,13 @@
 </head>
 
 <body>
-    <h1>• GAME •</h1>
+    <h1>• Flappy Gun •</h1>
     
     <script>
         var assetsMng = new AssetsManager();
         assetsMng.loadImage("player", "Assets/avatar1.png");
+        var fundoMng = new AssetsManager();
+        fundoMng.loadImage("bg", "Assets/bg_01.png");
         
         var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
         ctx, frames = 0, velocidade = 5, estadoAtual;
@@ -44,7 +46,7 @@
             perdeu: 2
         },
         chao = {
-            y: 460,
+            y: 433,
             altura: 30,
             cor: "#black",
             desenha: function () {
@@ -101,7 +103,6 @@
             requestAnimationFrame(roda);
         }
         
-        
         function roda(t) {
             dt = (t - anterior)/1000;
             atualiza();
@@ -113,6 +114,7 @@
             anterior = t
             ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y-5, 50, 50);
             
+            
             if(teclas.espaco && teclas.stop == 0 && bloco.atirando <= 0){
                 var tiro = new tiros({
                     x: bloco.x+35,
@@ -123,13 +125,13 @@
                     color: "black",
                 });
             
-            tirosVetor.push(tiro);
-            bloco.atirando = 1/3;
+                tirosVetor.push(tiro);
+                bloco.atirando = 1/10;
         }
         
         bloco.mover(dt);
-
-            for (var i = 0; i < tirosVetor.length; i++) {       
+        
+        for (var i = 0; i < tirosVetor.length; i++) {       
                 tirosVetor[i].mover(dt);
             }
             for (var i = 0; i < tirosVetor.length; i++) {     
@@ -137,23 +139,24 @@
             }
             for (var i = 0; i < tirosVetor.length; i++) {
                 if (tirosVetor[i].x > canvas.width)
-                     tirosVetor.splice(i, 1);
+                tirosVetor.splice(i, 1);
             }
-
+            
             requestAnimationFrame(roda);
         }
-
+        
         function atualiza() {
             frames++;
-
+            
             if (estadoAtual == estados.jogando) {
                 OBS.atualiza(bloco);
                 bloco.colidiuCom(OBS);
                 bloco.atualiza(chao);
                 inimigo.colidiu(tirosVetor);
+                inimigo.atualiza(estadoAtual, estados);
                 teclas.stop = 0;
             }
-
+            
             if(estadoAtual == estados.perdeu){
                 tirosVetor = [];
                 teclas.stop = 1;
@@ -164,9 +167,10 @@
             }
         }
         function desenha() {
-            ctx.fillStyle = "lightgreen";              //Cor da canvas
+            //ctx.fillStyle = "lightgreen";              //Cor da canvas
             ctx.fillRect(0, 0, LARGURA, ALTURA);    //Localizaçao da canvas
-           
+            ctx.drawImage(fundoMng.img("bg"), 0, 0, LARGURA, ALTURA);
+            
             if (estadoAtual == estados.jogar) {
                 ctx.fillStyle = "white";                                        //Cor do retangulo do play
                 ctx.fillRect((LARGURA / 2) - 100, (ALTURA / 2) - 50, 170, 68); //Localizaçao
@@ -201,9 +205,9 @@
                 ctx.fillText("Score:", 30, 50);
             }
             bloco.desenha(ctx);
-            chao.desenha();
+            //chao.desenha();
         }
         main();
-    </script>
+        </script>
 </body>
 </html>
