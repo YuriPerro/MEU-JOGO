@@ -17,14 +17,14 @@ Obstaculos.constructor = Obstaculos;
 Obstaculos.prototype.insere = function (){
     this.vetorObstaculo.push({
         x: LARGURA,
-        largura: 60,
+        largura: 75,
         altura: Math.floor(100 * Math.random()) + Math.floor(100 * Math.random()),
         cor: this.cores[Math.floor(3 * Math.random())]
     });
 
     this.vetorObstaculo2.push({
         x: LARGURA,
-        largura: 60,
+        largura: 75,
         altura: Math.floor(100 * Math.random()) + Math.floor(100 * Math.random()),
         cor: this.cores[Math.floor(3 * Math.random())]
     });
@@ -71,17 +71,21 @@ Obstaculos.prototype.limpa = function () {
     this.vetorObstaculo2 = [];
 }
 
-Obstaculos.prototype.desenha = function (){
+Obstaculos.prototype.desenha = function (obsMng){
     for (var i = 0, tam = this.vetorObstaculo.length; i < tam; i++) {
         var obs = this.vetorObstaculo[i];
-        ctx.fillStyle = obs.cor;
-        ctx.fillRect(obs.x, chao.y - obs.altura, obs.largura, obs.altura);
+        
+        //ctx.fillStyle = obs.cor;
+        //ctx.fillRect(obs.x, chao.y - obs.altura, obs.largura, obs.altura);
+        ctx.drawImage(obsMng.img("obs"), obs.x, chao.y - obs.altura, obs.largura, obs.altura);
     }
 
     for (var i = 0, tam = this.vetorObstaculo2.length; i < tam; i++) {
         var obs = this.vetorObstaculo2[i];
   
-        ctx.fillStyle = obs.cor;
-        ctx.fillRect(obs.x, 0, obs.largura, obs.altura);
+        /*ctx.fillStyle = obs.cor;
+        ctx.fillRect(obs.x, 0, obs.largura, obs.altura);*/
+
+        ctx.drawImage(obsMng2.img("obs2"), obs.x, 0, obs.largura, obs.altura);
     }
 }

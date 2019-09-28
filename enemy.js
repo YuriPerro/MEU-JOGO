@@ -3,13 +3,13 @@ function enemy(exemplo = {}){
         x = 1300,
         y = 150,
         w = 40,
-        h = 200,
+        h = 100,
         vx = 100,
         vy = 300,
         cont = 0,
-        tirosVetor1 = [],
         color = "black",
         atirando = 0,
+        vetorTiros = [],
     } = exemplo;
 
     this.atirando = atirando;
@@ -21,7 +21,7 @@ function enemy(exemplo = {}){
     this.vy = vy;
     this.color = color;
     this.cont = cont;
-    this.tirosVetor1 = tirosVetor1;
+    this.vetorTiros = vetorTiros;
 }
 
 enemy.prototype = new enemy();
@@ -44,11 +44,14 @@ enemy.prototype.mover = function(dt){
         if( this.y <= 10){
             this.vy = -this.vy;
         }
-        if(this.y + this.h >= 420){
+        if(this.y + this.h >= 430){
             this.vy = this.vy * (-1);
         }
     }
-    //this.atirar();
+
+    if(this.h > 0)
+        this.atirar();
+        
         if( this.atirando > 0 ){
             this.atirando = this.atirando - dt;
         }
@@ -58,8 +61,8 @@ enemy.prototype.colidiu = function(tirosVetor){
     if(this.vx == 0){
     for (var i = 0; i < tirosVetor.length; i++) {     
         if( tirosVetor[i].x + tirosVetor[i].h >= this.x && tirosVetor[i].y <= this.y + this.h
-            && tirosVetor[i].y + tirosVetor[i].h >= this.y ){
-                this.h -= 50;
+            && tirosVetor[i].y + tirosVetor[i].h >= this.y && this.h > 0 ){
+                this.h -= 25;
             } 
         }
     }
@@ -74,18 +77,24 @@ enemy.prototype.atualiza = function(estadoAtual, estados){
 enemy.prototype.atirar = function(){
     if( this.vx == 0 && this.atirando <= 0){
     var tiro = new tiros({
-            x: (this.x+this.h)/2,
-            y: this.y,
+            x: this.x,
+            y: this.y+this.h/2,
             w: 10,
             h: 10,
-            vx: -700,
+            vx: -1000,
             color: "black",
         });
-        this.atirando = 1/2;
-        tirosVetor1.push(tiro);
+        this.atirando = 1/3;
+        this.vetorTiros.push(tiro);
     }
-    for (var i = 0; i < tirosVetor1.length; i++) {
-        if (tirosVetor1[i].x > canvas.width)
-        tirosVetor1.splice(i, 1);
+    for (var i = 0; i < this.vetorTiros.length; i++) {       
+        this.vetorTiros[i].mover(dt);
+    }
+    for (var i = 0; i < this.vetorTiros.length; i++) {     
+        this.vetorTiros[i].desenha(ctx);
+    }
+    for (var i = 0; i < this.vetorTiros.length; i++) {
+        if (this.vetorTiros[i].x < 0 )
+        this.vetorTiros.splice(i, 1);
     }
 }

@@ -11,8 +11,7 @@
     <script src="AssetsManager.js"></script>
     <script src="enemy.js"></script>
     <link rel="stylesheet" href="style.css"/>
-    <style>
-    </style>
+    <link rel="icon" href="Assets/icon.png" />
 </head>
 
 <body>
@@ -23,12 +22,15 @@
         assetsMng.loadImage("player", "Assets/avatar1.png");
         var fundoMng = new AssetsManager();
         fundoMng.loadImage("bg", "Assets/bg_01.png");
+        var tiroMng = new AssetsManager();
+        tiroMng.loadImage("tiro", "Assets/tiros.png");
+        var obsMng = new AssetsManager();
+        obsMng.loadImage("obs", "Assets/obs.png");
+        var obsMng2 = new AssetsManager();
+        obsMng2.loadImage("obs2", "Assets/obs2.png");
         
         var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
         ctx, frames = 0, velocidade = 5, estadoAtual;
-        
-        //Adicionando AssetsManager a Cena 1
-        //var cena1 = new Scene({ ctx: ctx, w: canvas.width, h: canvas.height, assets:assetsMng})
         
         var bloco = new Sprite({});
         var OBS = new Obstaculos({});
@@ -39,7 +41,6 @@
             espaco: 0,
             stop: 0,
         }
-        
         estados = {
             jogar: 0,
             jogando: 1,
@@ -117,26 +118,27 @@
             
             if(teclas.espaco && teclas.stop == 0 && bloco.atirando <= 0){
                 var tiro = new tiros({
-                    x: bloco.x+35,
-                    y: bloco.y +23  ,
+                    x: bloco.x + 35,
+                    y: bloco.y + 23,
                     w: 10,
                     h: 10,
-                    vx: 700,
+                    vx: 400,
                     color: "black",
                 });
-            
+                
                 tirosVetor.push(tiro);
-                bloco.atirando = 1/10;
-        }
-        
-        bloco.mover(dt);
-        
-        for (var i = 0; i < tirosVetor.length; i++) {       
+                bloco.atirando = 1/3;
+            }
+            
+            bloco.mover(dt);
+            
+            for (var i = 0; i < tirosVetor.length; i++) {       
                 tirosVetor[i].mover(dt);
+                ctx.drawImage(tiroMng.img("tiro"), tirosVetor[i].x-9, tirosVetor[i].y-8, 32, 32);
             }
-            for (var i = 0; i < tirosVetor.length; i++) {     
+            /*for (var i = 0; i < tirosVetor.length; i++) {     
                 tirosVetor[i].desenha(ctx);
-            }
+            }*/
             for (var i = 0; i < tirosVetor.length; i++) {
                 if (tirosVetor[i].x > canvas.width)
                 tirosVetor.splice(i, 1);
@@ -187,7 +189,7 @@
 
                 ctx.fillStyle = "black";                                            //Cor do Record
                 ctx.font = "35px bold arial";                                       //Tipografia
-                ctx.fillText(recorde, (LARGURA / 2) + 15, (ALTURA / 2) - 10);       //Localizaçao da pontuaçao
+                ctx.fillText(recorde, (LARGURA / 2) + 15, (ALTURA / 2) - 12);       //Localizaçao da pontuaçao
                 ctx.fillText("Record: ", (LARGURA / 2) - 110, (ALTURA / 2) - 12);   //Localizaçao da escrita
                 
                 ctx.fillStyle = "black";                                //Cor do New Game
@@ -198,10 +200,10 @@
                 ctx.fillText("Tenta dnv campeão", (LARGURA / 2) - 230, (ALTURA / 2) - 100);    //Localizaçao
             }
             else if (estadoAtual == estados.jogando) {
-                OBS.desenha();
+                OBS.desenha(obsMng, obsMng2);
                 ctx.fillStyle = "black";
-                ctx.font = "35px bold impact";
-                ctx.fillText(pontos, 128, 52);
+                ctx.font = "45px bold impact";
+                ctx.fillText(pontos, 145, 52);
                 ctx.fillText("Score:", 30, 50);
             }
             bloco.desenha(ctx);
