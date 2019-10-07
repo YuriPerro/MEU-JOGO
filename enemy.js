@@ -50,7 +50,7 @@ enemy.prototype.mover = function(dt){
     }
 
     if(this.h > 0)
-        this.atirar();
+        //this.atirar();
         
         if( this.atirando > 0 ){
             this.atirando = this.atirando - dt;
@@ -63,6 +63,7 @@ enemy.prototype.colidiu = function(tirosVetor){
         if( tirosVetor[i].x + tirosVetor[i].h >= this.x && tirosVetor[i].y <= this.y + this.h
             && tirosVetor[i].y + tirosVetor[i].h >= this.y && this.h > 0 ){
                 this.h -= 25;
+                explosaoVetor.push(new Explosion({ x: tirosVetor[i].x, y:tirosVetor[i].y }));
             } 
         }
     }

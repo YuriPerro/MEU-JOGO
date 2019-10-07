@@ -32,7 +32,7 @@ Obstaculos.prototype.insere = function (){
     this.tempoInsere = 30 + Math.floor(60 * Math.random());
 }
 
-Obstaculos.prototype.atualiza = function (bloco){
+Obstaculos.prototype.atualiza = function (bloco, explosaoVetor){
     if (this.tempoInsere == 0) {
         this.insere();
     } else {
@@ -42,7 +42,7 @@ Obstaculos.prototype.atualiza = function (bloco){
             var obs = this.vetorObstaculo[i];
                 obs.x -= velocidade;
 
-                bloco.colidiuCom(obs);
+                bloco.colidiuCom(obs, explosaoVetor);
                     
              if (obs.x <= -obs.largura) {
                 this.vetorObstaculo.splice(i, 1);
@@ -55,7 +55,7 @@ Obstaculos.prototype.atualiza = function (bloco){
             var obs2 = this.vetorObstaculo2[i];
                 obs2.x -= velocidade;
             
-                bloco.colidiuCom2(obs2);
+                bloco.colidiuCom2(obs2, explosaoVetor);
                     
              if (obs2.x <= -obs2.largura) {
                 this.vetorObstaculo2.splice(i, 1);
@@ -71,13 +71,14 @@ Obstaculos.prototype.limpa = function () {
     this.vetorObstaculo2 = [];
 }
 
-Obstaculos.prototype.desenha = function (obsMng){
+Obstaculos.prototype.desenha = function (assetsMng){
     for (var i = 0, tam = this.vetorObstaculo.length; i < tam; i++) {
         var obs = this.vetorObstaculo[i];
         
         //ctx.fillStyle = obs.cor;
         //ctx.fillRect(obs.x, chao.y - obs.altura, obs.largura, obs.altura);
-        ctx.drawImage(obsMng.img("obs"), obs.x, chao.y - obs.altura, obs.largura, obs.altura);
+        
+        ctx.drawImage(assetsMng.img("obs"), obs.x, chao.y - obs.altura, obs.largura, obs.altura);
     }
 
     for (var i = 0, tam = this.vetorObstaculo2.length; i < tam; i++) {
@@ -86,6 +87,6 @@ Obstaculos.prototype.desenha = function (obsMng){
         /*ctx.fillStyle = obs.cor;
         ctx.fillRect(obs.x, 0, obs.largura, obs.altura);*/
 
-        ctx.drawImage(obsMng2.img("obs2"), obs.x, 0, obs.largura, obs.altura);
+        ctx.drawImage(assetsMng.img("obs2"), obs.x, 0, obs.largura, obs.altura);
     }
 }

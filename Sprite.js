@@ -47,7 +47,9 @@ Sprite.prototype.atualiza = function(chao){
 
     if(this.y > chao.y - this.altura){
         this.y = chao.y - this.altura;
-        this.velocidade = 0;
+        explosaoVetor.push(new Explosion({ x:this.x+30, y:this.y+25 }));
+        this.x = -100;
+        estadoAtual = estados.perdeu;
     }
 }
 
@@ -58,26 +60,31 @@ Sprite.prototype.mover = function(dt){
     }
 }
 
-Sprite.prototype.colidiuCom = function(obs){
+Sprite.prototype.colidiuCom = function(obs, explosaoVetor){
     if( obs.x <= -obs.largura)
         pontos += 1;
 
     if( this.y <= 0){
             estadoAtual = estados.perdeu;
-        }
+        }    
 
     if (this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
         && this.y + this.altura >= chao.y - obs.altura){
+            explosaoVetor.push(new Explosion({ x:this.x+30, y:this.y+25 }));
+            this.x = -100;
             recorde = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
         }
+    
 }
 
-Sprite.prototype.colidiuCom2 = function(obs){
+Sprite.prototype.colidiuCom2 = function(obs, explosaoVetor){
 
     if ( this.x < obs.x + obs.largura && this.x + this.largura >= obs.x
         && this.y <= obs.altura ){
+            explosaoVetor.push(new Explosion({ x:this.x+30, y:this.y+25 }));
+            this.x = -100;
             recorde = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
