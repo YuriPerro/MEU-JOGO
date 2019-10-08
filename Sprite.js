@@ -65,6 +65,8 @@ Sprite.prototype.colidiuCom = function(obs, explosaoVetor){
         pontos += 1;
 
     if( this.y <= 0){
+            recorde = pontos;
+            pontos = 0;
             estadoAtual = estados.perdeu;
         }    
 

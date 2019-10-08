@@ -50,7 +50,7 @@ enemy.prototype.mover = function(dt){
     }
 
     if(this.h > 0)
-        //this.atirar();
+        this.atirar();
         
         if( this.atirando > 0 ){
             this.atirando = this.atirando - dt;

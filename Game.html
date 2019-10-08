@@ -26,7 +26,10 @@
         assetsMng.loadImage("obs", "Assets/obs.png");
         assetsMng.loadImage("obs2", "Assets/obs2.png");
         assetsMng.loadImage("explosion", "Assets/Explosion.png");
-        
+        assetsMng.loadImage("bg_play", "Assets/bg_play.png");
+        assetsMng.loadImage("bg_play_HD", "Assets/bg_play_HD.png");
+        assetsMng.loadImage("bg_start", "Assets/bg_start.png");
+
         var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
         ctx, frames = 0, velocidade = 5, estadoAtual;
         
@@ -39,13 +42,14 @@
         var boom = new Explosion({x: 100, y:100, w: 64, h:64});
         
         var teclas = {
-            espaco: 0,
+            tiro: 0,
             stop: 0,
         }
         estados = {
             jogar: 0,
             jogando: 1,
-            perdeu: 2
+            perdeu: 2,
+            start: 3
         },
         chao = {
             y: 433,
@@ -60,25 +64,30 @@
         addEventListener("keydown", function(e){
             if (e.keyCode == 38){
                 bloco.pula();
+
+                if(estadoAtual == estados.start){
+                    OBS.limpa();
+                    velocidade = 5;
+                    bloco.gravidade = 0.5;
+                    bloco.x = 250;
+                    estadoAtual = estados.jogando;
+                }
             }
             if (e.keyCode == 87){
-                teclas.espaco = 1;
+                if( estadoAtual == estados.jogando)
+                    teclas.tiro = 1;
             }
         });
         
         addEventListener("keyup", function(e){
             if(e.keyCode == 87){
-                teclas.espaco = 0;
+                teclas.tiro = 0;
             }
         });
         
         addEventListener("mousedown", function clique(e) {
             if (estadoAtual == estados.jogar) {
-                OBS.limpa();
-                bloco.x = 250;
-                velocidade = 5;
-                bloco.gravidade = 0.5;
-                estadoAtual = estados.jogando;
+               estadoAtual = estados.start;
             }
             else if (estadoAtual == estados.perdeu) {
                 bloco.x = 250;
@@ -119,7 +128,7 @@
             anterior = t;
             ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y-5, 50, 50);      
             
-            if(teclas.espaco && teclas.stop == 0 && bloco.atirando <= 0){
+            if(teclas.tiro && teclas.stop == 0 && bloco.atirando <= 0){
                 var tiro = new tiros({
                     x: bloco.x + 35,
                     y: bloco.y + 23,
@@ -165,6 +174,8 @@
                 inimigo.atualiza(estadoAtual, estados);
                 teclas.stop = 0;
             }
+
+            
             
             if(estadoAtual == estados.perdeu){     
                 tirosVetor = [];
@@ -177,13 +188,17 @@
             ctx.drawImage(assetsMng.img("bg"), 0, 0, LARGURA, ALTURA);
             
             if (estadoAtual == estados.jogar) {
-                ctx.fillStyle = "white";                                        //Cor do retangulo do play
-                ctx.fillRect((LARGURA / 2) - 100, (ALTURA / 2) - 50, 170, 68); //Localizaçao
-
-                ctx.fillStyle = "green";                                    //Cor do PLAY
-                ctx.font = "50px bold arial";                               //Tipografia do PLAY
-                ctx.fillText("PLAY", (LARGURA / 2) - 80, (ALTURA / 2));     //Localizaçao do PLAY
+                if( LARGURA > 1360)
+                    ctx.drawImage(assetsMng.img("bg_play"), 0, 0, LARGURA, ALTURA);
+                else 
+                    ctx.drawImage(assetsMng.img("bg_play_HD"), 0, 0, LARGURA, ALTURA);
+                
             }
+            
+            if( estadoAtual == estados.start){
+                ctx.drawImage(assetsMng.img("bg_start"), 0, 0, LARGURA, ALTURA);
+            }
+            
             else if (estadoAtual == estados.perdeu) {
                 OBS.desenha(assetsMng);
 
