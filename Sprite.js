@@ -7,16 +7,18 @@ function Sprite(exemplo = {}){
         vx = 0,
         vy = 0,
         color = "#F9483B",
-        gravidade = 1.5,
+        gravidade = 0.5,
         velocidade = 0,
         forcaDoPulo = 7,
         atirando = 0,
+        img = 0,
     } = exemplo;
 
     this.x = x;
     this.y = y;
     this.largura = largura;
     this.altura = altura;
+    this.img = img;
 
     this.vx = vx;
     this.vy = vy;
@@ -31,10 +33,17 @@ Sprite.prototype = new Sprite({});
 Sprite.constructor = Sprite;
 
 Sprite.prototype.desenha = function(ctx){
-    //ctx.fillStyle = this.color;
-    //ctx.strokeStyle = "black";
-    //ctx.fillRect(this.x, this.y, this.largura, this.altura);
-    //ctx.strokeRect(this.x, this.y, this.largura, this.altura);
+
+   /* if (this.img == 0)
+        ctx.drawImage(assetsMng.img("player2"), bloco.x, bloco.y, 70, 70); 
+    else 
+        ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y, 70, 70); 
+    */
+
+    ctx.fillStyle = this.color;
+    ctx.strokeStyle = "black";
+    ctx.fillRect(this.x, this.y, this.largura, this.altura);
+    ctx.strokeRect(this.x, this.y, this.largura, this.altura);
 }
 
 Sprite.prototype.pula = function(){
@@ -58,6 +67,9 @@ Sprite.prototype.mover = function(dt){
     if( this.atirando > 0 ){
         this.atirando = this.atirando - dt;
     }
+    if( pontos > recorde){
+        recorde = pontos;
+    }
 }
 
 Sprite.prototype.colidiuCom = function(obs, explosaoVetor){
@@ -65,7 +77,7 @@ Sprite.prototype.colidiuCom = function(obs, explosaoVetor){
         pontos += 1;
 
     if( this.y <= 0){
-            recorde = pontos;
+            point = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
         }    
@@ -74,7 +86,7 @@ Sprite.prototype.colidiuCom = function(obs, explosaoVetor){
         && this.y + this.altura >= chao.y - obs.altura){
             explosaoVetor.push(new Explosion({ x:this.x+30, y:this.y+25 }));
             this.x = -100;
-            recorde = pontos;
+            point = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
         }
@@ -87,7 +99,7 @@ Sprite.prototype.colidiuCom2 = function(obs, explosaoVetor){
         && this.y <= obs.altura ){
             explosaoVetor.push(new Explosion({ x:this.x+30, y:this.y+25 }));
             this.x = -100;
-            recorde = pontos;
+            point = pontos;
             pontos = 0;
             estadoAtual = estados.perdeu;
     }

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Flappy Fire </title>
+    <script src="tiros.js"></script>
+    <script src="Sprite.js"></script>
+    <script src="Obstaculos.js"></script>
+    <script src="AssetsManager.js"></script>
+    <script src="enemy.js"></script>
+    <script src="Explosion.js"></script>
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="icon" href="Assets/icon.png" />
+</head>
+
+<body>
+    <h1>• Flappy Fire •</h1>
+    
+    <script>
+        var assetsMng = new AssetsManager();
+        assetsMng.loadImage("player", "Assets/avatar1.png");
+        assetsMng.loadImage("player2", "Assets/avatar2.png");
+        assetsMng.loadImage("bg", "Assets/bg_01.png");
+        assetsMng.loadImage("tiro", "Assets/tiros.png");
+        assetsMng.loadImage("obs", "Assets/obs.png");
+        assetsMng.loadImage("obs2", "Assets/obs2.png");
+        assetsMng.loadImage("explosion", "Assets/Explosion.png");
+        assetsMng.loadImage("bg_play", "Assets/bg_play.png");
+        assetsMng.loadImage("bg_play_HD", "Assets/bg_play_HD.png");
+        assetsMng.loadImage("bg_start", "Assets/bg_start.png");
+        assetsMng.loadImage("bg_start_HD", "Assets/bg_start_HD.png");
+        assetsMng.loadImage("bg_lost_fullhd", "Assets/bg_lost_fullhd.png");
+        assetsMng.loadImage("bg_lost_HD", "Assets/bg_lost_HD.png");
+
+        var canvas, pontos = 0, LARGURA, recorde = 0, point = 0, ALTURA, 
+        ctx, frames = 0, velocidade = 5, estadoAtual;
+        
+        var inimigo = new enemy({ x: window.innerWidth});
+        var bloco = new Sprite({});
+        var OBS = new Obstaculos({});
+        var tirosVetor = [];
+        var explosaoVetor = [];
+        var dt, anterior = 0;
+        var boom = new Explosion({x: 100, y:100, w: 64, h:64});
+        
+        var teclas = {
+            tiro: 0,
+            stop: 0,
+        }
+        estados = {
+            jogar: 0,
+            jogando: 1,
+            perdeu: 2,
+            start: 3
+        },
+        chao = {
+            y: 433,
+            altura: 30,
+            cor: "#black",
+            desenha: function () {
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(0, this.y, LARGURA, this.altura);
+            }
+        },
+        
+        addEventListener("keydown", function(e){
+            if (e.keyCode == 38){
+                bloco.pula();
+
+                if(estadoAtual == estados.start){
+                    OBS.limpa();
+                    velocidade = 5;
+                    bloco.gravidade = 0.5;
+                    bloco.x = 250;
+                    estadoAtual = estados.jogando;
+                }
+            }
+            if (e.keyCode == 87){
+                if( estadoAtual == estados.jogando){
+                    bloco.img = 1;
+                    teclas.tiro = 1;
+                }
+            }
+        });
+        
+        addEventListener("keyup", function(e){
+            if(e.keyCode == 87){
+                bloco.img = 0;
+                teclas.tiro = 0;
+            }
+        });
+        
+        addEventListener("mousedown", function clique(e) {
+            if (estadoAtual == estados.jogar) {
+               estadoAtual = estados.start;
+            }
+            else if (estadoAtual == estados.perdeu) {
+                bloco.y = -100;
+                bloco.gravidade = 0;
+                estadoAtual = estados.start;
+            }
+        });
+        
+        function main() {                                                   //Função main 
+            ALTURA = window.innerHeight;
+            LARGURA = window.innerWidth;
+            if (LARGURA >= 500) {
+                LARGURA = window.innerWidth - 100;
+                ALTURA = 500;
+            }
+            canvas = document.createElement("canvas");
+            canvas.width = LARGURA;
+            canvas.height = ALTURA;
+            
+            canvas.style.border = "5px solid black";
+            ctx = canvas.getContext("2d");
+            
+            document.body.appendChild(canvas);
+            estadoAtual = estados.jogar;
+            requestAnimationFrame(roda);
+        }
+        
+        
+        function roda(t) {
+            dt = (t - anterior)/1000;
+            atualiza();
+            desenha();
+            if( pontos > 0){  
+                inimigo.desenha(ctx);
+                inimigo.mover(dt);
+            }
+            anterior = t;
+            
+            if(teclas.tiro && teclas.stop == 0 && bloco.atirando <= 0){
+                var tiro = new tiros({
+                    x: bloco.x + 35,
+                    y: bloco.y + 23,
+                    w: 10,
+                    h: 10,
+                    vx: 400,
+                    color: "black",
+                });
+                
+                tirosVetor.push(tiro);
+                bloco.atirando = 1/3;
+            }
+            
+            bloco.mover(dt);
+            
+            for (var i = 0; i < tirosVetor.length; i++) {       
+                tirosVetor[i].mover(dt);
+                ctx.drawImage(assetsMng.img("tiro"), tirosVetor[i].x-9, tirosVetor[i].y-8, 32, 32);
+            }
+            for (var i = 0; i < tirosVetor.length; i++) {
+                if (tirosVetor[i].x > canvas.width)
+                tirosVetor.splice(i, 1);
+            }
+            
+            for (var i=0; i < explosaoVetor.length; i++){
+                explosaoVetor[i].mover(dt);
+            }
+            for (var i=0; i < explosaoVetor.length; i++){
+                explosaoVetor[i].desenhar(assetsMng);
+            }
+
+            requestAnimationFrame(roda);
+        }
+        
+        function atualiza() {
+            frames++;
+            
+            if (estadoAtual == estados.jogando) {
+                OBS.atualiza(bloco, explosaoVetor);
+                bloco.colidiuCom(OBS, explosaoVetor);
+                bloco.atualiza(chao);
+                inimigo.colidiu(tirosVetor);
+                inimigo.atualiza(estadoAtual, estados);
+                teclas.stop = 0;
+            }
+            
+            if( estadoAtual == estados.start){
+                bloco.x = 250;
+                bloco.y = 215;
+            }
+            
+            if(estadoAtual == estados.perdeu){     
+                tirosVetor = [];
+                teclas.stop = 1;
+            }
+        }
+        function desenha() {
+            ctx.fillRect(0, 0, LARGURA, ALTURA);    //Localizaçao da canvas
+            ctx.drawImage(assetsMng.img("bg"), 0, 0, LARGURA, ALTURA);
+            
+            if (estadoAtual == estados.jogar) {
+                if( LARGURA > 1360)
+                    ctx.drawImage(assetsMng.img("bg_play"), 0, 0, LARGURA, ALTURA);
+                else 
+                    ctx.drawImage(assetsMng.img("bg_play_HD"), 0, 0, LARGURA, ALTURA);          
+            }
+
+            if (estadoAtual == estados.start) {
+                if( LARGURA > 1360)
+                    ctx.drawImage(assetsMng.img("bg_start"), 0, 0, LARGURA, ALTURA);
+                else 
+                    ctx.drawImage(assetsMng.img("bg_start_HD"), 0, 0, LARGURA, ALTURA);          
+            }
+            
+            else if (estadoAtual == estados.perdeu) {
+                OBS.desenha(assetsMng);
+
+                if (estadoAtual == estados.perdeu) {
+                    if( LARGURA > 1360){
+                        ctx.drawImage(assetsMng.img("bg_lost_fullhd"), 0, 0, LARGURA, ALTURA);
+                        ctx.font = "43px bold times";                                       //Tipografia
+                        ctx.fillText(point, (LARGURA / 2) + 250, (ALTURA / 2)-1);       //Localizaçao da pontuaçao
+                        ctx.fillText(recorde, (LARGURA / 2) + 165, (ALTURA / 2)+62);    
+                    }
+                    else{ 
+                            ctx.drawImage(assetsMng.img("bg_lost_HD"), 0, 0, LARGURA, ALTURA);  
+                            ctx.font = "43px bold times";                                       //Tipografia
+                            ctx.fillText(point, (LARGURA / 2) + 270, (ALTURA / 2)+25);       //Localizaçao da pontuaçao 
+                            ctx.fillText(recorde, (LARGURA / 2) + 180, (ALTURA / 2)+88);       //Localizaçao da pontuaçao       
+                        }
+                    }
+            }
+            else if (estadoAtual == estados.jogando) {
+                OBS.desenha(assetsMng, assetsMng);
+                ctx.fillStyle = "black";
+                ctx.font = "45px bold optima";
+                ctx.fillText(pontos, 145, 52);
+                ctx.fillText("Score:", 30, 50);
+            }
+            bloco.desenha(ctx);
+            //chao.desenha();
+        }
+        main();
+        </script>
+</body>
+</html>

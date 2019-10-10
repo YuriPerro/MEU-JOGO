@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Flappy Gun </title>
+    <title> Flappy Fire </title>
     <script src="tiros.js"></script>
     <script src="Sprite.js"></script>
     <script src="Obstaculos.js"></script>
@@ -16,11 +16,12 @@
 </head>
 
 <body>
-    <h1>• Flappy Gun •</h1>
+    <h1>• Flappy Fire •</h1>
     
     <script>
         var assetsMng = new AssetsManager();
         assetsMng.loadImage("player", "Assets/avatar1.png");
+        assetsMng.loadImage("player2", "Assets/avatar2.png");
         assetsMng.loadImage("bg", "Assets/bg_01.png");
         assetsMng.loadImage("tiro", "Assets/tiros.png");
         assetsMng.loadImage("obs", "Assets/obs.png");
@@ -29,8 +30,11 @@
         assetsMng.loadImage("bg_play", "Assets/bg_play.png");
         assetsMng.loadImage("bg_play_HD", "Assets/bg_play_HD.png");
         assetsMng.loadImage("bg_start", "Assets/bg_start.png");
+        assetsMng.loadImage("bg_start_HD", "Assets/bg_start_HD.png");
+        assetsMng.loadImage("bg_lost_fullhd", "Assets/bg_lost_fullhd.png");
+        assetsMng.loadImage("bg_lost_HD", "Assets/bg_lost_HD.png");
 
-        var canvas, pontos = 0, LARGURA, recorde = 0, ALTURA, 
+        var canvas, pontos = 0, LARGURA, recorde = 0, point = 0, ALTURA, 
         ctx, frames = 0, velocidade = 5, estadoAtual;
         
         var inimigo = new enemy({ x: window.innerWidth});
@@ -74,13 +78,16 @@
                 }
             }
             if (e.keyCode == 87){
-                if( estadoAtual == estados.jogando)
+                if( estadoAtual == estados.jogando){
+                    bloco.img = 1;
                     teclas.tiro = 1;
+                }
             }
         });
         
         addEventListener("keyup", function(e){
             if(e.keyCode == 87){
+                bloco.img = 0;
                 teclas.tiro = 0;
             }
         });
@@ -90,10 +97,9 @@
                estadoAtual = estados.start;
             }
             else if (estadoAtual == estados.perdeu) {
-                bloco.x = 250;
-                bloco.y = 220;
+                bloco.y = -100;
                 bloco.gravidade = 0;
-                estadoAtual = estados.jogar;
+                estadoAtual = estados.start;
             }
         });
         
@@ -114,9 +120,7 @@
             document.body.appendChild(canvas);
             estadoAtual = estados.jogar;
             requestAnimationFrame(roda);
-        }
-        
-
+        }       
         function roda(t) {
             dt = (t - anterior)/1000;
             atualiza();
@@ -126,7 +130,6 @@
                 inimigo.mover(dt);
             }
             anterior = t;
-            ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y-5, 50, 50);      
             
             if(teclas.tiro && teclas.stop == 0 && bloco.atirando <= 0){
                 var tiro = new tiros({
@@ -152,7 +155,7 @@
                 if (tirosVetor[i].x > canvas.width)
                 tirosVetor.splice(i, 1);
             }
-
+            
             for (var i=0; i < explosaoVetor.length; i++){
                 explosaoVetor[i].mover(dt);
             }
@@ -174,8 +177,11 @@
                 inimigo.atualiza(estadoAtual, estados);
                 teclas.stop = 0;
             }
-
             
+            if( estadoAtual == estados.start){
+                bloco.x = 250;
+                bloco.y = 215;
+            }
             
             if(estadoAtual == estados.perdeu){     
                 tirosVetor = [];
@@ -183,7 +189,6 @@
             }
         }
         function desenha() {
-            //ctx.fillStyle = "lightgreen";              //Cor da canvas
             ctx.fillRect(0, 0, LARGURA, ALTURA);    //Localizaçao da canvas
             ctx.drawImage(assetsMng.img("bg"), 0, 0, LARGURA, ALTURA);
             
@@ -191,39 +196,38 @@
                 if( LARGURA > 1360)
                     ctx.drawImage(assetsMng.img("bg_play"), 0, 0, LARGURA, ALTURA);
                 else 
-                    ctx.drawImage(assetsMng.img("bg_play_HD"), 0, 0, LARGURA, ALTURA);
-                
+                    ctx.drawImage(assetsMng.img("bg_play_HD"), 0, 0, LARGURA, ALTURA);          
             }
-            
-            if( estadoAtual == estados.start){
-                ctx.drawImage(assetsMng.img("bg_start"), 0, 0, LARGURA, ALTURA);
+
+            if (estadoAtual == estados.start) {
+                if( LARGURA > 1360)
+                    ctx.drawImage(assetsMng.img("bg_start"), 0, 0, LARGURA, ALTURA);
+                else 
+                    ctx.drawImage(assetsMng.img("bg_start_HD"), 0, 0, LARGURA, ALTURA);          
             }
             
             else if (estadoAtual == estados.perdeu) {
                 OBS.desenha(assetsMng);
 
-                ctx.fillStyle = "white";                                //Fundo do PERDEU
-                ctx.fillRect(0, (ALTURA / 2) - 150, LARGURA, 68);       //Localizaçao do PERDEU
-                ctx.fillStyle = "white";                          //Fundo do New Game 
-                ctx.fillRect((LARGURA / 2) - 110, (ALTURA / 2) + 20, 150, 40);  // Localização 
-
-
-                ctx.fillStyle = "black";                                            //Cor do Record
-                ctx.font = "35px bold arial";                                       //Tipografia
-                ctx.fillText(recorde, (LARGURA / 2) + 15, (ALTURA / 2) - 12);       //Localizaçao da pontuaçao
-                ctx.fillText("Record: ", (LARGURA / 2) - 110, (ALTURA / 2) - 12);   //Localizaçao da escrita
-                
-                ctx.fillStyle = "black";                                //Cor do New Game
-                ctx.font = "25px bold moncspace";                       //Tipografia do New Game
-                ctx.fillText("New Game", (LARGURA / 2) - 92, (ALTURA / 2) + 48);    //Localizaçao
-                ctx.fillStyle = "red";                                  //Cor do Perdeu 
-                ctx.font = "50px bold moncspace";                       //Tipografia do Perdeu     
-                ctx.fillText("Tenta dnv campeão", (LARGURA / 2) - 230, (ALTURA / 2) - 100);    //Localizaçao
+                if (estadoAtual == estados.perdeu) {
+                    if( LARGURA > 1360){
+                        ctx.drawImage(assetsMng.img("bg_lost_fullhd"), 0, 0, LARGURA, ALTURA);
+                        ctx.font = "43px bold times";                                       //Tipografia
+                        ctx.fillText(point, (LARGURA / 2) + 250, (ALTURA / 2)-1);       //Localizaçao da pontuaçao
+                        ctx.fillText(recorde, (LARGURA / 2) + 165, (ALTURA / 2)+62);    
+                    }
+                    else{ 
+                            ctx.drawImage(assetsMng.img("bg_lost_HD"), 0, 0, LARGURA, ALTURA);  
+                            ctx.font = "43px bold times";                                       //Tipografia
+                            ctx.fillText(point, (LARGURA / 2) + 270, (ALTURA / 2)+25);       //Localizaçao da pontuaçao 
+                            ctx.fillText(recorde, (LARGURA / 2) + 180, (ALTURA / 2)+88);       //Localizaçao da pontuaçao       
+                        }
+                    }
             }
             else if (estadoAtual == estados.jogando) {
                 OBS.desenha(assetsMng, assetsMng);
                 ctx.fillStyle = "black";
-                ctx.font = "45px bold impact";
+                ctx.font = "45px bold optima";
                 ctx.fillText(pontos, 145, 52);
                 ctx.fillText("Score:", 30, 50);
             }
