@@ -18,14 +18,14 @@ Obstaculos.prototype.insere = function (){
     this.vetorObstaculo.push({
         x: LARGURA,
         largura: 75,
-        altura: Math.floor(100 * Math.random()) + Math.floor(100 * Math.random()),
+        altura: 50 + Math.floor(70 * Math.random()) + Math.floor(70 * Math.random()),
         cor: this.cores[Math.floor(3 * Math.random())]
     });
 
     this.vetorObstaculo2.push({
         x: LARGURA,
         largura: 75,
-        altura: Math.floor(100 * Math.random()) + Math.floor(100 * Math.random()),
+        altura: 50 + Math.floor(70 * Math.random()) + Math.floor(70 * Math.random()),
         cor: this.cores[Math.floor(3 * Math.random())]
     });
 

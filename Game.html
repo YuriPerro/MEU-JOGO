@@ -33,12 +33,15 @@
         assetsMng.loadImage("bg_start_HD", "Assets/bg_start_HD.png");
         assetsMng.loadImage("bg_lost_fullhd", "Assets/bg_lost_fullhd.png");
         assetsMng.loadImage("bg_lost_HD", "Assets/bg_lost_HD.png");
+        assetsMng.loadImage("box", "Assets/box.jpg");
+        assetsMng.loadImage("chao", "Assets/chao.png");
 
         var canvas, pontos = 0, LARGURA, recorde = 0, point = 0, ALTURA, 
-        ctx, frames = 0, velocidade = 5, estadoAtual;
+        ctx, velocidade = 5, estadoAtual;
         
         var inimigo = new enemy({ x: window.innerWidth});
         var bloco = new Sprite({});
+        var chaoSprite = new Sprite({x:0, y:433, altura:60});
         var OBS = new Obstaculos({});
         var tirosVetor = [];
         var explosaoVetor = [];
@@ -57,20 +60,32 @@
         },
         chao = {
             y: 433,
-            altura: 30,
-            cor: "#black",
+            x: 0,
+            altura: 60,
+            cor: "red",
+            atualiza: function(){
+                this.x -= velocidade;
+                if( this.x <= -1000)
+                    this.x = 0;
+            },
             desenha: function () {
-                ctx.fillStyle = this.cor;
-                ctx.fillRect(0, this.y, LARGURA, this.altura);
+                chaoSprite.desenhaChao(assetsMng, this.x);
+                chaoSprite.desenhaChao(assetsMng, this.x + 1360 );
+                //ctx.fillStyle = this.cor;
+                //ctx.fillRect(0, this.y, LARGURA, this.altura);
             }
         },
         
         addEventListener("keydown", function(e){
             if (e.keyCode == 38){
-                bloco.img = 1;
-                bloco.pula();
+                if( estadoAtual == estados.jogando){
+                    bloco.img = 1;
+                    bloco.pula();
+                }
 
                 if(estadoAtual == estados.start){
+                    bloco.img = 1;
+                    bloco.pula();
                     OBS.limpa();
                     velocidade = 5;
                     bloco.gravidade = 0.5;
@@ -78,10 +93,8 @@
                     estadoAtual = estados.jogando;
                 }
             }
-            if (e.keyCode == 87){
-                if( estadoAtual == estados.jogando){
+            if (e.keyCode == 87 && estadoAtual == estados.jogando){
                     teclas.tiro = 1;
-                }
             }
         });
         
@@ -169,12 +182,11 @@
         }
         
         function atualiza() {
-            frames++;
-            
             if (estadoAtual == estados.jogando) {
                 OBS.atualiza(bloco, explosaoVetor);
                 bloco.colidiuCom(OBS, explosaoVetor);
                 bloco.atualiza(chao);
+                chao.atualiza();
                 inimigo.colidiu(tirosVetor);
                 inimigo.atualiza(estadoAtual, estados);
                 teclas.stop = 0;
@@ -193,14 +205,15 @@
         function desenha() {
             ctx.fillRect(0, 0, LARGURA, ALTURA);    //Localizaçao da canvas
             ctx.drawImage(assetsMng.img("bg"), 0, 0, LARGURA, ALTURA);
+            chao.desenha();
             
             if (estadoAtual == estados.jogar) {
                 if( LARGURA > 1360)
-                    ctx.drawImage(assetsMng.img("bg_play"), 0, 0, LARGURA, ALTURA);
-                else 
-                    ctx.drawImage(assetsMng.img("bg_play_HD"), 0, 0, LARGURA, ALTURA);          
+                ctx.drawImage(assetsMng.img("bg_play"), 0, 0, LARGURA, ALTURA);
+            else 
+                ctx.drawImage(assetsMng.img("bg_play_HD"), 0, 0, LARGURA, ALTURA);          
             }
-
+            
             if (estadoAtual == estados.start) {
                 if( LARGURA > 1360)
                     ctx.drawImage(assetsMng.img("bg_start"), 0, 0, LARGURA, ALTURA);
@@ -233,8 +246,8 @@
                 ctx.fillText(pontos, 145, 52);
                 ctx.fillText("Score:", 30, 50);
             }
-            bloco.desenha(ctx);
             //chao.desenha();
+            bloco.desenha(ctx);
         }
         main();
         </script>

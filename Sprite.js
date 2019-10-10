@@ -32,13 +32,13 @@ function Sprite(exemplo = {}){
 Sprite.prototype = new Sprite({});
 Sprite.constructor = Sprite;
 
-Sprite.prototype.desenha = function(ctx){
+Sprite.prototype.desenha = function(ctx, x){
 
     if (this.img == 0)
         ctx.drawImage(assetsMng.img("player2"), bloco.x-11, bloco.y-8, 70, 70); 
     else 
         ctx.drawImage(assetsMng.img("player"), bloco.x-11, bloco.y-8, 70, 70); 
-    
+
     //ctx.fillStyle = this.color;
     //ctx.fillRect(this.x, this.y, this.largura, this.altura);
 }
@@ -100,4 +100,8 @@ Sprite.prototype.colidiuCom2 = function(obs, explosaoVetor){
             pontos = 0;
             estadoAtual = estados.perdeu;
     }
+}
+
+Sprite.prototype.desenhaChao = function(assetsMng, x){
+        ctx.drawImage(assetsMng.img("chao"), x, 430, 1360, 80 );
 }

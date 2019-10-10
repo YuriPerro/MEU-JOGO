@@ -2,8 +2,8 @@ function enemy(exemplo = {}){
     var {
         x = 1300,
         y = 150,
-        w = 40,
-        h = 100,
+        w = 50,
+        h = 50,
         vx = 100,
         vy = 300,
         cont = 0,
@@ -28,15 +28,17 @@ enemy.prototype = new enemy();
 enemy.prototype.constructor = enemy;
 
 enemy.prototype.desenha = function(ctx){
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.w, this.h);
-}
+   
+    ctx.drawImage(assetsMng.img("box"), this.x, this.y, 50, 50);
 
+    //ctx.fillStyle = this.color;
+    //ctx.fillRect(this.x, this.y, this.w, this.h)
+}
 enemy.prototype.mover = function(dt){
     this.x = this.x - this.vx * dt;
     this.cont++;
     
-    if( this.cont > 100){
+    if( this.cont > 150){
         this.vx = 0;
 
         this.y = this.y - this.vy * dt;
@@ -50,7 +52,7 @@ enemy.prototype.mover = function(dt){
     }
 
     if(this.h > 0)
-        this.atirar();
+        //this.atirar();
         
         if( this.atirando > 0 ){
             this.atirando = this.atirando - dt;
