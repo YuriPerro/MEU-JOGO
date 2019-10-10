@@ -67,6 +67,7 @@
         
         addEventListener("keydown", function(e){
             if (e.keyCode == 38){
+                bloco.img = 1;
                 bloco.pula();
 
                 if(estadoAtual == estados.start){
@@ -79,7 +80,6 @@
             }
             if (e.keyCode == 87){
                 if( estadoAtual == estados.jogando){
-                    bloco.img = 1;
                     teclas.tiro = 1;
                 }
             }
@@ -87,8 +87,10 @@
         
         addEventListener("keyup", function(e){
             if(e.keyCode == 87){
-                bloco.img = 0;
                 teclas.tiro = 0;
+            }
+            if (e.keyCode == 38){
+                bloco.img = 0;
             }
         });
         
@@ -125,7 +127,7 @@
             dt = (t - anterior)/1000;
             atualiza();
             desenha();
-            if( pontos > 0){  
+            if( pontos > 0 && estadoAtual == estados.jogando){  
                 inimigo.desenha(ctx);
                 inimigo.mover(dt);
             }

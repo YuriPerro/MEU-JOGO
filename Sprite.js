@@ -34,16 +34,13 @@ Sprite.constructor = Sprite;
 
 Sprite.prototype.desenha = function(ctx){
 
-   /* if (this.img == 0)
-        ctx.drawImage(assetsMng.img("player2"), bloco.x, bloco.y, 70, 70); 
+    if (this.img == 0)
+        ctx.drawImage(assetsMng.img("player2"), bloco.x-11, bloco.y-8, 70, 70); 
     else 
-        ctx.drawImage(assetsMng.img("player"), bloco.x, bloco.y, 70, 70); 
-    */
-
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = "black";
-    ctx.fillRect(this.x, this.y, this.largura, this.altura);
-    ctx.strokeRect(this.x, this.y, this.largura, this.altura);
+        ctx.drawImage(assetsMng.img("player"), bloco.x-11, bloco.y-8, 70, 70); 
+    
+    //ctx.fillStyle = this.color;
+    //ctx.fillRect(this.x, this.y, this.largura, this.altura);
 }
 
 Sprite.prototype.pula = function(){
